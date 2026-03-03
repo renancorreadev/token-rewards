@@ -8,6 +8,9 @@ import {
 import {
     ERC1155Supply
 } from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+import {
+    ERC1155Burnable
+} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
@@ -17,7 +20,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 ///         directly to all Token A holders in a single transaction.
 /// @dev Follows building-secure-contracts: AccessControl with separated roles, NatSpec, custom errors,
 ///      Math.mulDiv for safe proportional arithmetic, on-chain holder tracking for push distribution.
-contract TokenRewards is ERC1155Pausable, ERC1155Supply, AccessControl {
+contract TokenRewards is ERC1155Burnable, ERC1155Pausable, ERC1155Supply, AccessControl {
     // ===================== Errors =====================
 
     /// @dev Mint called with zero amount.
@@ -177,7 +180,7 @@ contract TokenRewards is ERC1155Pausable, ERC1155Supply, AccessControl {
         address to,
         uint256[] memory ids,
         uint256[] memory values
-    ) internal override(ERC1155Pausable, ERC1155Supply) {
+    ) internal override(ERC1155, ERC1155Pausable, ERC1155Supply) {
         super._update(from, to, ids, values);
 
         for (uint256 i = 0; i < ids.length; i++) {
