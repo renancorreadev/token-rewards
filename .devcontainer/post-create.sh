@@ -102,6 +102,5 @@ forge --version
 slither --version 2>/dev/null || true
 echidna --version
 medusa --version
-claude --version
 echo "---"
 echo "🐚 Shell: zsh + Oh My Zsh + Powerlevel10k"
