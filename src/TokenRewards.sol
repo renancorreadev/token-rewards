@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import {
+    ERC1155Pausable
+} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Pausable.sol";
 import {
     ERC1155Supply
 } from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
@@ -14,7 +17,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 ///         directly to all Token A holders in a single transaction.
 /// @dev Follows building-secure-contracts: AccessControl with separated roles, NatSpec, custom errors,
 ///      Math.mulDiv for safe proportional arithmetic, on-chain holder tracking for push distribution.
-contract TokenRewards is ERC1155Supply, AccessControl {
+contract TokenRewards is ERC1155Pausable, ERC1155Supply, AccessControl {
     // ===================== Errors =====================
 
     /// @dev Mint called with zero amount.
@@ -81,6 +84,18 @@ contract TokenRewards is ERC1155Supply, AccessControl {
         _grantRole(DISTRIBUTOR_ROLE, admin);
     }
 
+    // ===================== Pausability =====================
+
+    /// @notice Pauses all token transfers, mints and burns.
+    function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _pause();
+    }
+
+    /// @notice Unpauses all token transfers, mints and burns.
+    function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _unpause();
+    }
+
     // ===================== External Functions =====================
 
     /// @notice Mints Token A to a single recipient.
@@ -105,6 +120,7 @@ contract TokenRewards is ERC1155Supply, AccessControl {
     function distributeTokenB(
         uint256 totalAmount
     ) external onlyRole(DISTRIBUTOR_ROLE) {
+        _requireNotPaused();
         if (totalAmount == 0) revert ZeroDistributionAmount();
 
         uint256 holdersCount = _holders.length;
@@ -161,7 +177,7 @@ contract TokenRewards is ERC1155Supply, AccessControl {
         address to,
         uint256[] memory ids,
         uint256[] memory values
-    ) internal override(ERC1155Supply) {
+    ) internal override(ERC1155Pausable, ERC1155Supply) {
         super._update(from, to, ids, values);
 
         for (uint256 i = 0; i < ids.length; i++) {
