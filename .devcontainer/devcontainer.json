@@ -1,0 +1,80 @@
+{
+    "name": "Smart Contract Development",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "target": "toolbox"
+    },
+    "remoteUser": "ethsec",
+    "containerUser": "ethsec",
+    "workspaceFolder": "/home/ethsec/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ethsec/workspace,type=bind,consistency=cached",
+    "containerEnv": {
+        "QEMU_LD_PREFIX": "/usr/x86_64-linux-gnu",
+        "SHELL": "/bin/zsh"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": true,
+            "configureZshAsDefaultShell": true,
+            "installOhMyZsh": true,
+            "installOhMyZshConfig": true,
+            "username": "ethsec"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "editor.formatOnSave": true,
+                "editor.tabSize": 4,
+                "solidity.compileUsingRemoteVersion": "",
+                "solidity.linter": "slither",
+                "solidity.enabledAsYouTypeCompilationErrorCheck": true,
+                "solidity.defaultCompiler": "localNodeModule",
+                "files.associations": {
+                    "*.md": "markdown",
+                    "*.yaml": "yaml",
+                    "*.yml": "yaml",
+                    "*.json": "json",
+                    "*.toml": "toml",
+                    "*.ini": "ini",
+                    "*.conf": "conf",
+                    "*.cfg": "cfg",
+                    "*.config": "config",
+                    "*.config.yaml": "yaml",
+                    "*.sol": "solidity",
+                    "*.vy": "vyper"
+                },
+                "[solidity]": {
+                    "editor.defaultFormatter": "JuanBlanco.solidity"
+                }
+            },
+            "extensions": [
+                "JuanBlanco.solidity",
+                "NomicFoundation.hardhat-solidity",
+                "tintinweb.solidity-visual-auditor",
+                "tintinweb.vscode-solidity-flattener",
+                "trailofbits.slither-vscode",
+                "tamasfe.even-better-toml",
+                "tintinweb.vscode-vyper",
+                "anthropic.claude-code"
+            ]
+        }
+    },
+    "forwardPorts": [
+        8545
+    ],
+    "portsAttributes": {
+        "8545": {
+            "label": "Anvil / Local Node",
+            "onAutoForward": "silent"
+        }
+    },
+    "postCreateCommand": "bash /home/ethsec/workspace/.devcontainer/post-create.sh",
+    "hostRequirements": {
+        "cpus": 2,
+        "memory": "4gb",
+        "storage": "16gb"
+    }
+}
