@@ -1,19 +1,13 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-import {Script, console} from "forge-std/Script.sol";
+import {Script} from "forge-std/Script.sol";
 import {TokenRewards} from "../src/TokenRewards.sol";
 
-contract CounterScript is Script {
-    TokenRewards public tokenRewards;
-
-    function setUp() public {}
-
+contract TokenRewardsScript is Script {
     function run() public {
         vm.startBroadcast();
-
-        tokenRewards = new TokenRewards();
-
+        new TokenRewards(msg.sender, "");
         vm.stopBroadcast();
     }
 }
