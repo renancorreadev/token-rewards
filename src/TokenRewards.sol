@@ -20,7 +20,12 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 ///         directly to all Token A holders in a single transaction.
 /// @dev Follows building-secure-contracts: AccessControl with separated roles, NatSpec, custom errors,
 ///      Math.mulDiv for safe proportional arithmetic, on-chain holder tracking for push distribution.
-contract TokenRewards is ERC1155Burnable, ERC1155Pausable, ERC1155Supply, AccessControl {
+contract TokenRewards is
+    ERC1155Burnable,
+    ERC1155Pausable,
+    ERC1155Supply,
+    AccessControl
+{
     // ===================== Errors =====================
 
     /// @dev Mint called with zero amount.
@@ -114,6 +119,28 @@ contract TokenRewards is ERC1155Burnable, ERC1155Pausable, ERC1155Supply, Access
         _mint(to, TOKEN_A, amount, "");
 
         emit TokenAMinted(to, amount);
+    }
+
+    /// @notice Mints Token A to multiple recipients in a single transaction.
+    /// @param recipients Array of recipient addresses.
+    /// @param amounts Array of amounts to mint. Must match recipients length.
+    function batchMintTokenA(
+        address[] calldata recipients,
+        uint256[] calldata amounts
+    ) external onlyRole(MINTER_ROLE) {
+        uint256 length = recipients.length;
+        if (length == 0) revert BatchEmpty();
+        if (length != amounts.length)
+            revert BatchLengthMismatch(length, amounts.length);
+
+        for (uint256 i = 0; i < length; i++) {
+            address to = recipients[i];
+            uint256 amount = amounts[i];
+            if (to == address(0)) revert MintToZeroAddress();
+            if (amount == 0) revert MintAmountZero(to);
+            _mint(to, TOKEN_A, amount, "");
+            emit TokenAMinted(to, amount);
+        }
     }
 
     /// @notice Distributes Token B proportionally to all current Token A holders.

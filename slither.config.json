@@ -1,0 +1,6 @@
+{
+  "detectors_to_exclude": "naming-convention,pragma",
+  "exclude_dependencies": true,
+  "filter_paths": "lib/,test/,script/",
+  "fail_on": "medium"
+}

@@ -1,0 +1,6 @@
+testMode: "property"
+testLimit: 50000
+seqLen: 100
+corpusDir: "test/echidna/corpus"
+cryticArgs: ["--foundry-compile-all"]
+format: "text"

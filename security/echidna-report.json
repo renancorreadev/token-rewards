@@ -1,0 +1,29 @@
+{
+  "date": "2026-03-03",
+  "tool": "Echidna 2.3.1",
+  "contract": "src/TokenRewards.sol",
+  "test_file": "test/echidna/TokenRewardsEchidna.sol",
+  "config": {
+    "testMode": "property",
+    "testLimit": 50000,
+    "seqLen": 100
+  },
+  "results": {
+    "echidna_zero_balance_not_holder": "passing",
+    "echidna_isHolder_consistent_with_balance": "passing",
+    "echidna_holdersCount_bounded": "passing",
+    "echidna_totalSupplyB_equals_sum_of_balances": "passing",
+    "echidna_holdersCount_matches_actual": "passing",
+    "echidna_holders_array_length_matches_count": "passing",
+    "echidna_totalSupplyA_equals_sum_of_balances": "passing"
+  },
+  "all_passing": true,
+  "coverage": {
+    "tokenrewards_lines": "78/78 (100%)",
+    "unique_instructions": 14624,
+    "unique_codehashes": 3,
+    "corpus_size": 10,
+    "seed": 8433927097104774972,
+    "total_calls": 50249
+  }
+}
