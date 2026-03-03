@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Base} from "./Base.t.sol";
+import {TokenRewards} from "../src/TokenRewards.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
@@ -116,6 +117,101 @@ contract ConstructorTest is Base {
             )
         );
         token.grantRole(minterRole, alice);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                            SET URI
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Should_AllowAdmin_ToUpdateURI() public {
+        string memory newURI = "https://new.example.com/metadata/{id}.json";
+
+        vm.prank(admin);
+        token.setURI(newURI);
+
+        assertEq(token.uri(0), newURI, "URI for token 0 should be updated");
+        assertEq(token.uri(1), newURI, "URI for token 1 should be updated");
+    }
+
+    function test_Should_EmitURIUpdated_OnSetURI() public {
+        string memory newURI = "https://new.example.com/metadata/{id}.json";
+
+        vm.prank(admin);
+
+        vm.expectEmit(false, false, false, true, address(token));
+        emit TokenRewards.URIUpdated(newURI);
+
+        token.setURI(newURI);
+    }
+
+    function test_RevertWhen_UnauthorizedAddress_CallsSetURI() public {
+        vm.prank(unauthorized);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IAccessControl.AccessControlUnauthorizedAccount.selector,
+                unauthorized,
+                adminRole
+            )
+        );
+        token.setURI("https://malicious.com/{id}.json");
+    }
+
+    function test_RevertWhen_MinterRole_CallsSetURI() public {
+        vm.prank(minter);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IAccessControl.AccessControlUnauthorizedAccount.selector,
+                minter,
+                adminRole
+            )
+        );
+        token.setURI("https://malicious.com/{id}.json");
+    }
+
+    function test_RevertWhen_DistributorRole_CallsSetURI() public {
+        vm.prank(distributor);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IAccessControl.AccessControlUnauthorizedAccount.selector,
+                distributor,
+                adminRole
+            )
+        );
+        token.setURI("https://malicious.com/{id}.json");
+    }
+
+    function test_Should_AllowAdmin_ToSetEmptyURI() public {
+        vm.prank(admin);
+        token.setURI("");
+
+        assertEq(token.uri(0), "", "URI for token 0 should be empty");
+        assertEq(token.uri(1), "", "URI for token 1 should be empty");
+    }
+
+    function test_Should_AllowAdmin_ToUpdateURI_MultipleTimes() public {
+        string memory firstURI = "https://first.example.com/{id}.json";
+        string memory secondURI = "https://second.example.com/{id}.json";
+
+        vm.startPrank(admin);
+        token.setURI(firstURI);
+        assertEq(token.uri(0), firstURI, "URI should match first update");
+
+        token.setURI(secondURI);
+        assertEq(token.uri(0), secondURI, "URI should match second update");
+        vm.stopPrank();
+    }
+
+    function test_Should_AllowAdmin_ToSetURI_WhilePaused() public {
+        vm.startPrank(admin);
+        token.pause();
+        token.setURI("https://paused.example.com/{id}.json");
+        vm.stopPrank();
+
+        assertEq(
+            token.uri(0),
+            "https://paused.example.com/{id}.json",
+            "URI should be updated even while paused"
+        );
     }
 
     /*//////////////////////////////////////////////////////////////

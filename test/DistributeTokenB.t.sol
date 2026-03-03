@@ -130,9 +130,91 @@ contract DistributeTokenBTest is Base {
         vm.prank(distributor);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.TokenBDistributed(1000, 2);
+        emit TokenRewards.TokenBDistributed(1000, 1000, 2);
 
         token.distributeTokenB(1000);
+    }
+
+    function test_Should_EmitTotalMinted_LessThanTotalAmount_WhenDustExists()
+        public
+    {
+        // alice=1, bob=1, carol=1 → total=3, distribute 10 → 3 each = 9 minted
+        vm.startPrank(minter);
+        token.mintTokenA(alice, 1);
+        token.mintTokenA(bob, 1);
+        token.mintTokenA(carol, 1);
+        vm.stopPrank();
+
+        vm.prank(distributor);
+
+        vm.expectEmit(false, false, false, true, address(token));
+        emit TokenRewards.TokenBDistributed(10, 9, 3);
+
+        token.distributeTokenB(10);
+    }
+
+    function test_Should_EmitTotalMinted_EqualTotalAmount_WhenNoDust() public {
+        // alice=50, bob=50 → total=100, distribute 1000 → 500 each = 1000 minted
+        vm.startPrank(minter);
+        token.mintTokenA(alice, 50);
+        token.mintTokenA(bob, 50);
+        vm.stopPrank();
+
+        vm.prank(distributor);
+
+        vm.expectEmit(false, false, false, true, address(token));
+        emit TokenRewards.TokenBDistributed(1000, 1000, 2);
+
+        token.distributeTokenB(1000);
+    }
+
+    function test_Should_EmitTotalMinted_EqualTotalAmount_ForSingleHolder()
+        public
+    {
+        vm.prank(minter);
+        token.mintTokenA(alice, 100);
+
+        vm.prank(distributor);
+
+        vm.expectEmit(false, false, false, true, address(token));
+        emit TokenRewards.TokenBDistributed(500, 500, 1);
+
+        token.distributeTokenB(500);
+    }
+
+    function test_Should_EmitCorrectTotalMinted_WithUnequalShares() public {
+        // alice=30, bob=50, carol=20 → total=100, distribute 1000
+        // alice=300, bob=500, carol=200 → totalMinted=1000
+        vm.startPrank(minter);
+        token.mintTokenA(alice, 30);
+        token.mintTokenA(bob, 50);
+        token.mintTokenA(carol, 20);
+        vm.stopPrank();
+
+        vm.prank(distributor);
+
+        vm.expectEmit(false, false, false, true, address(token));
+        emit TokenRewards.TokenBDistributed(1000, 1000, 3);
+
+        token.distributeTokenB(1000);
+    }
+
+    function test_Should_EmitTotalMinted_WithMaxDust() public {
+        // 3 holders with equal share, distribute 2 → floor(2*1/3)=0 each → totalMinted=0
+        // But reward=0 is skipped, so totalMinted=0
+        // Actually: distribute 5 → floor(5*1/3)=1 each → totalMinted=3, dust=2
+        vm.startPrank(minter);
+        token.mintTokenA(alice, 1);
+        token.mintTokenA(bob, 1);
+        token.mintTokenA(carol, 1);
+        vm.stopPrank();
+
+        vm.prank(distributor);
+
+        vm.expectEmit(false, false, false, true, address(token));
+        emit TokenRewards.TokenBDistributed(5, 3, 3);
+
+        token.distributeTokenB(5);
     }
 
     /*//////////////////////////////////////////////////////////////

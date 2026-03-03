@@ -55,7 +55,10 @@ contract TokenRewards is
     event TokenAMinted(address indexed to, uint256 amount);
 
     /// @notice Emitted when Token B is distributed to all holders.
-    event TokenBDistributed(uint256 totalAmount, uint256 holdersCount);
+    event TokenBDistributed(uint256 totalAmount, uint256 totalMinted, uint256 holdersCount);
+
+    /// @notice Emitted when the base URI is updated by admin.
+    event URIUpdated(string newURI);
 
     // ===================== Constants & Roles =====================
 
@@ -102,6 +105,13 @@ contract TokenRewards is
     /// @notice Unpauses all token transfers, mints and burns.
     function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
         _unpause();
+    }
+
+    /// @notice Updates the base URI for all token types.
+    /// @param newURI New base URI string.
+    function setURI(string calldata newURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setURI(newURI);
+        emit URIUpdated(newURI);
     }
 
     // ===================== External Functions =====================
@@ -159,6 +169,8 @@ contract TokenRewards is
         uint256 supply = totalSupply(TOKEN_A);
         if (supply == 0) revert NoTokenASupply();
 
+        uint256 totalMinted = 0;
+
         for (uint256 i = 0; i < holdersCount; i++) {
             address holder = _holders[i];
             uint256 holderBalance = balanceOf(holder, TOKEN_A);
@@ -166,10 +178,11 @@ contract TokenRewards is
 
             if (reward > 0) {
                 _mint(holder, TOKEN_B, reward, "");
+                totalMinted += reward;
             }
         }
 
-        emit TokenBDistributed(totalAmount, holdersCount);
+        emit TokenBDistributed(totalAmount, totalMinted, holdersCount);
     }
 
     // ===================== View Functions =====================
