@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Base} from "./Base.t.sol";
 import {TokenRewards} from "../src/TokenRewards.sol";
+import {ITokenRewards} from "../src/ITokenRewards.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
@@ -130,7 +131,7 @@ contract DistributeTokenBTest is Base {
         vm.prank(distributor);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.TokenBDistributed(1000, 1000, 2);
+        emit ITokenRewards.TokenBDistributed(1000, 1000, 2);
 
         token.distributeTokenB(1000);
     }
@@ -148,7 +149,7 @@ contract DistributeTokenBTest is Base {
         vm.prank(distributor);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.TokenBDistributed(10, 9, 3);
+        emit ITokenRewards.TokenBDistributed(10, 9, 3);
 
         token.distributeTokenB(10);
     }
@@ -163,7 +164,7 @@ contract DistributeTokenBTest is Base {
         vm.prank(distributor);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.TokenBDistributed(1000, 1000, 2);
+        emit ITokenRewards.TokenBDistributed(1000, 1000, 2);
 
         token.distributeTokenB(1000);
     }
@@ -177,7 +178,7 @@ contract DistributeTokenBTest is Base {
         vm.prank(distributor);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.TokenBDistributed(500, 500, 1);
+        emit ITokenRewards.TokenBDistributed(500, 500, 1);
 
         token.distributeTokenB(500);
     }
@@ -194,7 +195,7 @@ contract DistributeTokenBTest is Base {
         vm.prank(distributor);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.TokenBDistributed(1000, 1000, 3);
+        emit ITokenRewards.TokenBDistributed(1000, 1000, 3);
 
         token.distributeTokenB(1000);
     }
@@ -212,7 +213,7 @@ contract DistributeTokenBTest is Base {
         vm.prank(distributor);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.TokenBDistributed(5, 3, 3);
+        emit ITokenRewards.TokenBDistributed(5, 3, 3);
 
         token.distributeTokenB(5);
     }
@@ -276,13 +277,13 @@ contract DistributeTokenBTest is Base {
         token.mintTokenA(alice, 100);
 
         vm.prank(distributor);
-        vm.expectRevert(TokenRewards.ZeroDistributionAmount.selector);
+        vm.expectRevert(ITokenRewards.ZeroDistributionAmount.selector);
         token.distributeTokenB(0);
     }
 
     function test_RevertWhen_NoHolders_Exist() public {
         vm.prank(distributor);
-        vm.expectRevert(TokenRewards.NoHolders.selector);
+        vm.expectRevert(ITokenRewards.NoHolders.selector);
         token.distributeTokenB(1000);
     }
 }

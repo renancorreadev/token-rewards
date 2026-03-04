@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Base} from "./Base.t.sol";
 import {TokenRewards} from "../src/TokenRewards.sol";
+import {ITokenRewards} from "../src/ITokenRewards.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 
 /// @notice Tests for mintTokenA: happy path, events, access control and input validation.
@@ -82,7 +83,7 @@ contract MintTokenATest is Base {
         vm.prank(minter);
 
         vm.expectEmit(true, false, false, true, address(token));
-        emit TokenRewards.TokenAMinted(alice, 100);
+        emit ITokenRewards.TokenAMinted(alice, 100);
 
         token.mintTokenA(alice, 100);
     }
@@ -144,14 +145,14 @@ contract MintTokenATest is Base {
     function test_RevertWhen_MintAmount_IsZero() public {
         vm.prank(minter);
         vm.expectRevert(
-            abi.encodeWithSelector(TokenRewards.MintAmountZero.selector, alice)
+            abi.encodeWithSelector(ITokenRewards.MintAmountZero.selector, alice)
         );
         token.mintTokenA(alice, 0);
     }
 
     function test_RevertWhen_MintTo_ZeroAddress() public {
         vm.prank(minter);
-        vm.expectRevert(TokenRewards.MintToZeroAddress.selector);
+        vm.expectRevert(ITokenRewards.MintToZeroAddress.selector);
         token.mintTokenA(address(0), 100);
     }
 

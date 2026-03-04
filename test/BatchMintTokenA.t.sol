@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Base} from "./Base.t.sol";
 import {TokenRewards} from "../src/TokenRewards.sol";
+import {ITokenRewards} from "../src/ITokenRewards.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
@@ -123,10 +124,10 @@ contract BatchMintTokenATest is Base {
         vm.prank(minter);
 
         vm.expectEmit(true, false, false, true, address(token));
-        emit TokenRewards.TokenAMinted(alice, 100);
+        emit ITokenRewards.TokenAMinted(alice, 100);
 
         vm.expectEmit(true, false, false, true, address(token));
-        emit TokenRewards.TokenAMinted(bob, 200);
+        emit ITokenRewards.TokenAMinted(bob, 200);
 
         token.batchMintTokenA(recipients, amounts);
     }
@@ -180,7 +181,7 @@ contract BatchMintTokenATest is Base {
 
         vm.prank(minter);
         vm.expectRevert(
-            abi.encodeWithSelector(TokenRewards.BatchLengthMismatch.selector, 2, 1)
+            abi.encodeWithSelector(ITokenRewards.BatchLengthMismatch.selector, 2, 1)
         );
         token.batchMintTokenA(recipients, amounts);
     }
@@ -190,7 +191,7 @@ contract BatchMintTokenATest is Base {
         uint256[] memory amounts = new uint256[](0);
 
         vm.prank(minter);
-        vm.expectRevert(TokenRewards.BatchEmpty.selector);
+        vm.expectRevert(ITokenRewards.BatchEmpty.selector);
         token.batchMintTokenA(recipients, amounts);
     }
 
@@ -202,7 +203,7 @@ contract BatchMintTokenATest is Base {
         amounts[0] = 100;
 
         vm.prank(minter);
-        vm.expectRevert(TokenRewards.MintToZeroAddress.selector);
+        vm.expectRevert(ITokenRewards.MintToZeroAddress.selector);
         token.batchMintTokenA(recipients, amounts);
     }
 
@@ -215,7 +216,7 @@ contract BatchMintTokenATest is Base {
 
         vm.prank(minter);
         vm.expectRevert(
-            abi.encodeWithSelector(TokenRewards.MintAmountZero.selector, alice)
+            abi.encodeWithSelector(ITokenRewards.MintAmountZero.selector, alice)
         );
         token.batchMintTokenA(recipients, amounts);
     }

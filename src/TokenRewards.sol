@@ -13,6 +13,7 @@ import {
 } from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {ITokenRewards} from "./ITokenRewards.sol";
 
 /// @title TokenRewards
 /// @notice ERC-1155 with two token types: Token A (membership) and Token B (proportional reward).
@@ -21,44 +22,12 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 /// @dev Follows building-secure-contracts: AccessControl with separated roles, NatSpec, custom errors,
 ///      Math.mulDiv for safe proportional arithmetic, on-chain holder tracking for push distribution.
 contract TokenRewards is
+    ITokenRewards,
     ERC1155Burnable,
     ERC1155Pausable,
     ERC1155Supply,
     AccessControl
 {
-    // ===================== Errors =====================
-
-    /// @dev Mint called with zero amount.
-    error MintAmountZero(address to);
-
-    /// @dev Mint called with address(0) as recipient.
-    error MintToZeroAddress();
-
-    /// @dev Batch mint called with mismatched array lengths.
-    error BatchLengthMismatch(uint256 recipientsLength, uint256 amountsLength);
-
-    /// @dev Batch mint called with empty arrays.
-    error BatchEmpty();
-
-    /// @dev distributeTokenB called with zero amount.
-    error ZeroDistributionAmount();
-
-    /// @dev distributeTokenB called but Token A totalSupply is zero.
-    error NoTokenASupply();
-
-    /// @dev distributeTokenB called but no Token A holders exist.
-    error NoHolders();
-
-    // ===================== Events =====================
-
-    /// @notice Emitted when Token A is minted to a single recipient.
-    event TokenAMinted(address indexed to, uint256 amount);
-
-    /// @notice Emitted when Token B is distributed to all holders.
-    event TokenBDistributed(uint256 totalAmount, uint256 totalMinted, uint256 holdersCount);
-
-    /// @notice Emitted when the base URI is updated by admin.
-    event URIUpdated(string newURI);
 
     // ===================== Constants & Roles =====================
 

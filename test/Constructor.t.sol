@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Base} from "./Base.t.sol";
 import {TokenRewards} from "../src/TokenRewards.sol";
+import {ITokenRewards} from "../src/ITokenRewards.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
@@ -139,7 +140,7 @@ contract ConstructorTest is Base {
         vm.prank(admin);
 
         vm.expectEmit(false, false, false, true, address(token));
-        emit TokenRewards.URIUpdated(newURI);
+        emit ITokenRewards.URIUpdated(newURI);
 
         token.setURI(newURI);
     }
